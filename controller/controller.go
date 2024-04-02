@@ -8,11 +8,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Uttkarsh-Raj/Proxie/model"
 	"github.com/gin-gonic/gin"
-)
-
-var (
-	filename = "./logs.txt"
 )
 
 func ProxyServer() gin.HandlerFunc {
@@ -48,10 +45,12 @@ func ProxyServer() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error reading response body: %s", err)})
 			return
 		}
-		fmt.Println(c.ClientIP())
-		fmt.Println(resp.Request.Host)
-		fmt.Println(c.Request.UserAgent())
-		fmt.Println(resp.Request.Method)
+		newLog := model.Log(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
+		err = newLog.AppendLog()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error logging the information: %s", err)})
+			return
+		}
 		c.Redirect(http.StatusTemporaryRedirect, queryURL)
 	}
 }
