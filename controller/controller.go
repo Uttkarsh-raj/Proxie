@@ -62,6 +62,11 @@ func ProxyServer() gin.HandlerFunc {
 		// Set the request time
 		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
 
+		// For testing pourpose
+		if queryURL == "https://www.tests.com/" {
+			c.String(http.StatusOK, "<html><h1>Test Page</h1></html>")
+		}
+
 		// Add this to the logs.txt file
 		newLog := model.Log(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
 		err = newLog.AppendLog()
