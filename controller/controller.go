@@ -65,6 +65,8 @@ func ProxyServer() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error connecting to the destination server: %s", err)})
 			return
 		}
+
+		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
 	}
 }
 
