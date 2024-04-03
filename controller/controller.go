@@ -32,8 +32,6 @@ func ProxyServer() gin.HandlerFunc {
 			return
 		}
 
-		println(getClientIP(c))
-
 		// Check the last requested time < 5sec
 		err = RateLimitChecker(getClientIP(c))
 		if err != nil {
@@ -75,6 +73,12 @@ func ProxyServer() gin.HandlerFunc {
 		// Copy the response body to the current response
 		if _, err := io.Copy(c.Writer, resp.Body); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error connecting to the destination server: %s", err)})
+			return
+		}
+		newLog := model.Log(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
+		err = newLog.AppendLog()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error logging the information: %s", err)})
 			return
 		}
 
