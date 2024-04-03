@@ -15,18 +15,22 @@ func TestProxyServer(t *testing.T) {
 	router := gin.Default()
 	router.GET("/", controller.ProxyServer())
 
-	// Test the proxy servers function
-	req, _ := http.NewRequest("GET", "/?url=https://www.tests.com/", nil)
+	// Test the proxy server's function
+	req, _ := http.NewRequest("GET", "/?url=https://www.tsetit.com/", nil)
+	req.Header.Add("X-Forwarded-For", "123.123.123.123")
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "https://www.tests.com/", w.Header().Get("Location"))
+	expectedResponse := "<html><h1>Test Page</h1></html>"
+	assert.Equal(t, expectedResponse, w.Body.String())
 
-	// Check the Rate Limiter
+	// Test the rate limiter
 	err := `{"error":"error: Please wait for 5s seconds before next request"}`
-	req, _ = http.NewRequest("GET", "/?url=https://www.tests.com/", nil)
+	req, _ = http.NewRequest("GET", "/?url=https://www.tsetit.com/", nil)
+	req.Header.Add("X-Forwarded-For", "123.123.123.123")
+
 	w = httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)

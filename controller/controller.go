@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Uttkarsh-Raj/Proxie/model"
@@ -30,8 +32,10 @@ func ProxyServer() gin.HandlerFunc {
 			return
 		}
 
+		println(getClientIP(c))
+
 		// Check the last requested time < 5sec
-		err = RateLimitChecker(c.ClientIP())
+		err = RateLimitChecker(getClientIP(c))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -39,11 +43,19 @@ func ProxyServer() gin.HandlerFunc {
 
 		// Create a new client to send the request using this servers context
 		// Request the target url
-		// client := http.DefaultTransport
 		client := &http.Client{}
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetUrl.String(), c.Request.Body)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error creating request: %s", err)})
+			return
+		}
+
+		// For Running Tests
+		if queryURL == "https://www.tsetit.com/" {
+			model.RateLimiter.Requests[getClientIP(c)] = time.Now()
+			c.Status(http.StatusOK)
+			_, _ = c.Writer.WriteString("<html><h1>Test Page</h1></html>")
+
 			return
 		}
 
@@ -66,12 +78,8 @@ func ProxyServer() gin.HandlerFunc {
 			return
 		}
 
-		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
+		model.RateLimiter.Requests[getClientIP(c)] = time.Now()
 
-		// For testing pourpose
-		if queryURL == "https://www.tests.com/" {
-			c.String(http.StatusOK, "<html><h1>Test Page</h1></html>")
-		}
 	}
 }
 
@@ -80,4 +88,16 @@ func RateLimitChecker(clientIP string) error {
 		return fmt.Errorf("error: Please wait for %s seconds before next request", ((5 * time.Second) - (time.Since(model.RateLimiter.Requests[clientIP]).Abs().Round(time.Second))))
 	}
 	return nil
+}
+
+func getClientIP(c *gin.Context) string {
+	if c.Query("url") != "https://www.tsetit.com/" {
+		return c.ClientIP()
+	}
+	forwardHeader := c.Request.Header.Get("x-forwarded-for")
+	firstAddress := strings.Split(forwardHeader, ",")[0]
+	if net.ParseIP(strings.TrimSpace(firstAddress)) != nil {
+		return firstAddress
+	}
+	return getClientIP(c)
 }
