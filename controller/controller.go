@@ -14,7 +14,7 @@ import (
 
 func ProxyServer() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 		defer cancel()
 		// Get the query URL
 		queryURL := c.Query("url")
@@ -39,8 +39,9 @@ func ProxyServer() gin.HandlerFunc {
 
 		// Create a new client to send the request using this servers context
 		// Request the target url
+		// client := http.DefaultTransport
 		client := &http.Client{}
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetUrl.String(), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetUrl.String(), c.Request.Body)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error creating request: %s", err)})
 			return
@@ -53,30 +54,17 @@ func ProxyServer() gin.HandlerFunc {
 		}
 		defer resp.Body.Close()
 
-		_, err = io.ReadAll(resp.Body)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error reading response body: %s", err)})
+		// Copy the response and the headers received
+		c.Status(resp.StatusCode)
+		for k, v := range resp.Header {
+			c.Header(k, v[0])
+		}
+
+		// Copy the response body to the current response
+		if _, err := io.Copy(c.Writer, resp.Body); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error connecting to the destination server: %s", err)})
 			return
 		}
-
-		// Set the request time
-		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
-
-		// For testing pourpose
-		if queryURL == "https://www.tests.com/" {
-			c.String(http.StatusOK, "<html><h1>Test Page</h1></html>")
-		}
-
-		// Add this to the logs.txt file
-		newLog := model.Log(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
-		err = newLog.AppendLog()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error logging the information: %s", err)})
-			return
-		}
-
-		// Redirect to the requested page
-		c.Redirect(http.StatusTemporaryRedirect, queryURL)
 	}
 }
 
