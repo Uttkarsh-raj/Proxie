@@ -26,6 +26,11 @@ func ProxyServer() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error parsing target URL: %s", err)})
 			return
 		}
+		if time.Since(model.RateLimiter.Requests[c.ClientIP()]) < time.Second*10 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Please wait for %s seconds before next request.", ((10 * time.Second) - (time.Since(model.RateLimiter.Requests[c.ClientIP()]).Abs().Round(time.Second))))})
+			return
+		}
+		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
 		client := &http.Client{}
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetUrl.String(), nil)
 		if err != nil {
