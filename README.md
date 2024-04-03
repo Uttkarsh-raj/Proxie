@@ -116,11 +116,10 @@ With its customizable features and easy integration, Proxie can serve as a relia
 <br>
 <center>
 <img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/3acaa7b6-464d-4ad4-97f9-0a6fad8a2607"></img>
-<br> <br>
-<div style="display:flex">
-<img width="500" height="400" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/0861ba55-5b71-4868-9f9b-7c492faf4057"></img>
-<img width="500" height="400" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/bf2b36cc-f2cd-4837-8182-8383867c5c99"></img>
-</div>
+<br> 
+<img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/0861ba55-5b71-4868-9f9b-7c492faf4057"></img>
+<br>
+<img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/bf2b36cc-f2cd-4837-8182-8383867c5c99"></img>
 </center>
 <br>
 <!-- ROADMAP -->
