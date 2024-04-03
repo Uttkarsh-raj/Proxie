@@ -67,6 +67,11 @@ func ProxyServer() gin.HandlerFunc {
 		}
 
 		model.RateLimiter.Requests[c.ClientIP()] = time.Now()
+
+		// For testing pourpose
+		if queryURL == "https://www.tests.com/" {
+			c.String(http.StatusOK, "<html><h1>Test Page</h1></html>")
+		}
 	}
 }
 
