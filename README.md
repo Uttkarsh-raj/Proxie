@@ -1,6 +1,8 @@
 # Proxie
 <br>
+<center>
 Proxie, a proxy server in Golang, shields clients from direct server exposure. It features advanced logging for comprehensive network traffic monitoring and analysis, crucial for troubleshooting and security auditing. Additionally, Proxie's rate-limiting mechanism ensures fair resource allocation, enhancing server performance and stability while mitigating the risk of abuse and vulnerabilities.
+</center>
 <br><br>
 
 <!--TABLE OF CONTENTS-->
@@ -32,8 +34,8 @@ Proxie, a proxy server in Golang, shields clients from direct server exposure. I
 <!--About the Project-->
   
 ## About The Project
-
-Proxie is a simple proxy server made in golang which prevents the client getting exposed to the server. Additionally , Proxie offers advanced logging functionalities, enabling administrators to monitor and analyze network traffic comprehensively. This feature is crucial for troubleshooting, compliance, and security auditing purposes.Proxie implements a rate-limiting mechanism to prevent abuse and ensure fair resource allocation. This feature enhances server performance and stability, mitigating the risk of service disruptions and security vulnerabilities.
+<center>
+Proxie is a simple proxy server made in golang which prevents the client getting exposed to the server. Additionally , Proxie offers advanced logging functionalities, enabling administrators to monitor and analyze network traffic comprehensively. This feature is crucial for troubleshooting, compliance, and security auditing purposes.Proxie implements a rate-limiting mechanism to prevent abuse and ensure fair resource allocation. This feature enhances server performance and stability, mitigating the risk of service disruptions and security vulnerabilities.</center>
   
 
 ### Built With
@@ -46,6 +48,7 @@ Proxie is a simple proxy server made in golang which prevents the client getting
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!--GETTING STARTED-->
 
@@ -109,6 +112,16 @@ The Proxie proxy server project offers a versatile solution for various networki
 
 With its customizable features and easy integration, Proxie can serve as a reliable proxy server solution for a variety of networking needs.
 
+## Screenshots:
+<br>
+<center>
+<img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/3acaa7b6-464d-4ad4-97f9-0a6fad8a2607"></img>
+<br> 
+<img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/0861ba55-5b71-4868-9f9b-7c492faf4057"></img>
+<br>
+<img width="1000" src="https://github.com/Uttkarsh-raj/Proxie/assets/106571927/bf2b36cc-f2cd-4837-8182-8383867c5c99"></img>
+</center>
+<br>
 <!-- ROADMAP -->
 
 ## Roadmap
