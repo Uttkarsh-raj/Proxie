@@ -1,8 +1,12 @@
 package model
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type RateLimiterModel struct {
+	Mutex    sync.RWMutex
 	Requests map[string]time.Time
 }
 

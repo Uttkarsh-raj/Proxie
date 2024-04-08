@@ -32,6 +32,9 @@ func ProxyServer() gin.HandlerFunc {
 			return
 		}
 
+		model.RateLimiter.Mutex.Lock()
+		defer model.RateLimiter.Mutex.Unlock()
+
 		// Check the last requested time < 5sec
 		err = RateLimitChecker(getClientIP(c))
 		if err != nil {
@@ -57,6 +60,8 @@ func ProxyServer() gin.HandlerFunc {
 			return
 		}
 
+		model.RateLimiter.Requests[getClientIP(c)] = time.Now()
+
 		resp, err := client.Do(req)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error connecting to the destination server: %s", err)})
@@ -75,14 +80,12 @@ func ProxyServer() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error connecting to the destination server: %s", err)})
 			return
 		}
-		newLog := model.Log(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
+		newLog := model.ConvertToLog(c.ClientIP(), resp.Request.Method, resp.Request.Host, c.Request.UserAgent())
 		err = newLog.AppendLog()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error logging the information: %s", err)})
 			return
 		}
-
-		model.RateLimiter.Requests[getClientIP(c)] = time.Now()
 
 	}
 }

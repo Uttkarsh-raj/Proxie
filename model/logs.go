@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"time"
@@ -14,7 +15,7 @@ type Logs struct {
 	Agent         string
 }
 
-func Log(clientIp, method, serverIp, agent string) Logs {
+func ConvertToLog(clientIp, method, serverIp, agent string) Logs {
 	return Logs{
 		Date:          time.Now(),
 		ClientIp:      clientIp,
@@ -25,7 +26,7 @@ func Log(clientIp, method, serverIp, agent string) Logs {
 }
 
 var (
-	filename = "./logs.txt"
+	filename = "./logs.csv"
 )
 
 func (l *Logs) AppendLog() error {
@@ -38,17 +39,19 @@ func (l *Logs) AppendLog() error {
 		return fmt.Errorf("failed to open log file: %w", err)
 	}
 	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
 	if flag {
-		_, err = fmt.Fprintf(file, "%s \t %s \t %s \t %s \t %s\n",
-			"Date", "Client-Ip", "Method", "Server-Address", "User-Agent")
-		if err != nil {
+		row := []string{"Date", "Client-Ip", "Method", "Query-To", "User-Agent"}
+		if err := writer.Write(row); err != nil {
 			return fmt.Errorf("failed to write to log file: %w", err)
 		}
 	}
 
-	_, err = fmt.Fprintf(file, "%s \t %s \t %s \t %s \t %s\n",
-		l.Date.Format(time.RFC3339), l.ClientIp, l.Method, l.ServerAddress, l.Agent)
-	if err != nil {
+	row := []string{l.Date.Format(time.RFC3339), l.ClientIp, l.Method, l.ServerAddress, l.Agent}
+	if err := writer.Write(row); err != nil {
 		return fmt.Errorf("failed to write to log file: %w", err)
 	}
 	return nil
